@@ -19,7 +19,7 @@
   * want: `batPing hit ballPung at batPong`
   */
 
-package au.om.carringbushsw.PingPong
+package au.com.carringbushsw.PingPong
 
 import akka.actor.{ Actor, ActorSystem, Props }
 import au.com.carringbushsw.Tag._

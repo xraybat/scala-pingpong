@@ -2,7 +2,7 @@
   * Created by psc on 28/04/17.
   */
 
-package au.om.carringbushsw.PingPong
+package au.com.carringbushsw.PingPong
 
 import org.scalatest.FlatSpec
 
