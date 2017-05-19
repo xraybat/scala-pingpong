@@ -40,12 +40,12 @@ class HelloActor(myName: String) extends Actor {
 ////////////////////////////////////////
 
 trait Equip {
-  val genus: String
-  val name: String
+  val _genus: String
+  val _name: String
 
   private val uuid = new TagUuid(EquipTag.Tag)
 
-  override def toString: String = name + "/" + genus + ":" + uuid
+  override def toString: String = _name + "/" + _genus + ":" + uuid
 }
 
 // constants ///////////////////////////
@@ -61,26 +61,32 @@ object EquipGenus {
 
 ////////////////////////////////////////
 
-abstract class Bat(_name: String) extends Equip {
-  val genus = EquipGenus.Bat
-  val name = _name
+/**??
+  * `hit`, `miss`, `receiver` messages should really be case classes operands
+  * passed by the `!` operator to/from actors (for eventaul akka incorporation)
+  * smartgit / publishLocal this then change??
+  */
 
-  def !(ball: Ball, batTo: Bat) : Unit        // `hit` message operator
-  def ~(ball: Ball, batThis: Bat) : Unit = {} // `miss`` message operator; implemented
+abstract class Bat(name: String) extends Equip {
+  val _genus = EquipGenus.Bat
+  val _name = name
+
+  def !(ball: Ball, batTo: Bat): Unit        // `hit` message operator
+  def ~(ball: Ball, batThis: Bat): Unit = {} // `miss`` message operator; implemented
 
   // optional word aliases for operators
-  def hit(ball: Ball, batTo: Bat) : Unit = this ! (ball, batTo)
-  def miss(ball: Ball, batThis: Bat) : Unit = this ~ (ball, batThis)
+  def hit(ball: Ball, batTo: Bat): Unit = this ! (ball, batTo)
+  def miss(ball: Ball, batThis: Bat): Unit = this ~ (ball, batThis)
 }
 
-abstract class Ball(_name: String) extends Equip {
-  val genus = EquipGenus.Ball
-  val name = _name
+abstract class Ball(name: String) extends Equip {
+  val _genus = EquipGenus.Ball
+  val _name = name
 
-  def <(batFrom: Bat, batTo: Option[Bat], action: (Ball, Bat) => Unit) : Unit // `receiver` message operator + function arg
+  def <(batFrom: Bat, batTo: Option[Bat], action: (Ball, Bat) => Unit): Unit // `receiver` message operator + function arg
 
   // optional word aliases for operators
-  def receiver(batFrom: Bat, batTo: Option[Bat], action: (Ball, Bat) => Unit) : Unit = this < (batFrom, batTo, action)
+  def receiver(batFrom: Bat, batTo: Option[Bat], action: (Ball, Bat) => Unit): Unit = this < (batFrom, batTo, action)
 }
 
 abstract class PingPongBat(name: String) extends Bat(name) {}
@@ -97,18 +103,18 @@ abstract class PingPongBall(name: String) extends Ball(name) {}
   */
 /* extends Actor */
 class Ping(name: String) extends PingPongBat(name) {
-  override def !(ball: Ball, batTo: Bat) : Unit = ball < (this, Some(batTo), batTo.!)
+  override def !(ball: Ball, batTo: Bat): Unit = ball < (this, Some(batTo), batTo.!)
 }
 
 /* extends Actor */
 class Pong(name: String) extends PingPongBat(name) {
-  override def !(ball: Ball, batTo: Bat) : Unit = ball < (this, None, batTo.~)
+  override def !(ball: Ball, batTo: Bat): Unit = ball < (this, None, batTo.~)
 }
 
 /* extends Actor */
 class Pung(name: String) extends PingPongBall(name) {
   // either `batTo.!` (hit) or `batFrom.~` (miss) depending on `action` and `this`
-  override def <(batFrom: Bat, batTo: Option[Bat] = None, action: (Ball, Bat) => Unit) : Unit = {
+  override def <(batFrom: Bat, batTo: Option[Bat] = None, action: (Ball, Bat) => Unit): Unit = {
     println(">>> " + batTo)
     println("+++ " + batTo.getOrElse("(not given)"))
     assert(action != null)  // need this?? or is there a "must supply" as the reverse of `Option[]`??

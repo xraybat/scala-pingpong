@@ -7,17 +7,17 @@ package au.com.carringbushsw.PingPong
 import akka.actor.{ Actor, ActorSystem, Props }
 
 abstract class Game {
-  def ^() : Unit  // `play` message operator
+  def ^(): Unit  // `play` message operator
 
   // optional word aliases for operators
-  def play() : Unit = this.^()
+  def play(): Unit = this.^()
 }
 
 ////////////////////////////////////////
 
 // game controller
 class PingPong extends Game {
-  override def ^() : Unit = {
+  override def ^(): Unit = {
     /**
       * note: actors must persist in *own* thread
       */
